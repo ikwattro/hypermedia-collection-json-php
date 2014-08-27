@@ -4,13 +4,33 @@ namespace Kwattro\Hypermedia\CollectionJson;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Kwattro\Hypermedia\CollectionJson\Item;
+use JMS\Serializer\Annotation\AccessorOrder;
+use JMS\Serializer\Annotation\VirtualProperty;
+use JMS\Serializer\Annotation\SerializedName;
+use JMS\Serializer\Annotation\Type;
 
+/**
+ * @AccessorOrder("custom", custom = {"version", "href" ,"items", "errors"})
+ *
+ */
 class Collection
 {
     const version = "1.0";
 
+    /**
+     * @Type("ArrayCollection")
+     *
+     */
     protected $items;
+
+    /**
+     * @Type("string")
+     */
     protected $href;
+
+    /**
+     * @Type("array")
+     */
     protected $errors;
 
     /**
@@ -23,6 +43,9 @@ class Collection
     }
 
     /**
+     * @VirtualProperty
+     * @SerializedName("items")
+     *
      * Returns the collection of Items
      *
      * @return ArrayCollection
@@ -33,6 +56,10 @@ class Collection
     }
 
     /**
+     * @VirtualProperty
+     * @SerializedName("version")
+     *
+     *
      * Returns the current version of the Collection+Json Hypermadia Format
      *
      * @return string
@@ -65,6 +92,9 @@ class Collection
     }
 
     /**
+     * @VirtualProperty
+     * @SerializedName("href")
+     *
      * Gets the Collection location
      *
      * @return mixed
@@ -85,6 +115,9 @@ class Collection
     }
 
     /**
+     * @VirtualProperty
+     * @SerializedName("errors")
+     *
      * Get errors related to the resource location query
      *
      * @return array
@@ -112,5 +145,37 @@ class Collection
     public function getErrorsCount()
     {
         return count($this->errors);
+    }
+
+    /**
+     * Serialize the Collection object to Json
+     *
+     * @return string json object
+     */
+    public function serialize()
+    {
+        return json_encode($this->getArrayCollection());
+    }
+
+    /**
+     * Get an array representation of the Collection
+     *
+     * @return array
+     */
+    public function getArrayCollection()
+    {
+        $items = array();
+        foreach ($this->items as $item) {
+            $items[] = $item->toArray();
+        }
+        $arrayCollection = array(
+            'collection' => array(
+                'version' => self::version,
+                'href' => $this->href,
+                'items' => $items,
+                'errors' => $this->getErrors()
+            )
+        );
+        return $arrayCollection;
     }
 }

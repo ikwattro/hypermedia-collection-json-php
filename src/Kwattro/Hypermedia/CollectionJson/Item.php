@@ -114,4 +114,15 @@ class Item
     {
         return isset($this->data[$key]) ? true : false;
     }
+
+    public function toArray()
+    {
+        $arrayItem = array(
+            "href" => $this->href,
+            "links" => $this->links,
+            "data" => $this->data
+        );
+
+        return $arrayItem;
+    }
 }

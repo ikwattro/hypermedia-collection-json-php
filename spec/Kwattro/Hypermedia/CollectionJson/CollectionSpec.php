@@ -69,4 +69,15 @@ class CollectionSpec extends ObjectBehavior
             )
         ));
     }
+
+    function it_should_arrayize_the_collection(Item $item)
+    {
+        $item->setHref('http://example.com/user/1234');
+        $item->addData(array('name' => 'John'));
+        $this->setHref('http://example.com');
+        $this->addItem($item);
+        $coll = $this->getArrayCollection();
+        $coll['collection']['version']->shouldReturn('1.0');
+        $items = $coll['collection']['items'];
+    }
 }
